@@ -3,7 +3,7 @@
 Arduboy2 arduboy;
 
 // screen size: 128x64
-#define TILE_SIZE 4
+#define TILE_SIZE 8
 
 // game states
 enum state {
@@ -20,6 +20,9 @@ int direction = 3; // movement direction
 
 int x = 3; // snake coordinates
 int y = 4;
+
+int foodx = -2;
+int foody = -2;
 
 int length = 1; // length of the snake
 
@@ -44,6 +47,25 @@ void snake_pushback(int x, int y) {
   
   snaketrail[0][0] = x;
   snaketrail[0][1] = y;
+}
+
+
+// spawns food randomly, not placing it on the snake
+void spawnfood() {
+  foodx = -2;
+  foody = -2;
+  
+  while (foodx == -2 && foody == -2){
+    foodx = random(1, 128/TILE_SIZE - 1);
+    foody = random(1, 64/TILE_SIZE - 1);
+    
+    for (int i = 0; i < length; i++) {
+      if (snaketrail[i][0] == foodx && snaketrail[i][1] == foody){
+        foodx = -2;
+        foody = -2;
+      }
+    }
+  }
 }
 
 
@@ -89,6 +111,7 @@ void loop() {
         
         delayframes -= 1;
         
+      // moves the snake depending on the direction it faces
       } else {
         switch (direction) {
           case 1: // down
@@ -108,12 +131,12 @@ void loop() {
             break;
         }
         
-        delayframes = 15;
+        delayframes = 10;
         
         snake_pushback(x, y);
       }
       
-      
+      // screen looping
       if (x > 128/TILE_SIZE - 1) { x = 0; }
       else if ( x < 0) { x = 128/TILE_SIZE - 1; }
       
@@ -121,7 +144,7 @@ void loop() {
       else if ( y < 0) { y = 64/TILE_SIZE - 1; }
       
       
-      // snake tail drawing
+      // draws the entire snake and checks for collisions
       for (int i = 0; i < length; i++) {
         if (snaketrail[i + 1][0] == x && snaketrail[i + 1][1] == y){
           game = LOSE;
@@ -130,8 +153,15 @@ void loop() {
         arduboy.fillRect(snaketrail[i][0] * TILE_SIZE, snaketrail[i][1] * TILE_SIZE, TILE_SIZE, TILE_SIZE);
       }
       
+      // checks if the player is touching the food
+      if (x == foodx && y == foody){
+        length += 1;
+        spawnfood();
+      }
       
-//      arduboy.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+      // draws food square
+      arduboy.drawRect(foodx * TILE_SIZE, foody * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+      
       break;
     
     
@@ -147,19 +177,23 @@ void loop() {
       arduboy.print("PRESS A");
       
       if (arduboy.pressed(A_BUTTON)){
-        game = START;
+        game = RESET;
       }
       break;
       
     
+    // resets snake size and position before beginning the game
     case RESET:
+      // immediately moves to force the visuals to update
+      delayframes = 0;
+      
       x = 3;
       y = 4;
-      length = 5;
+      length = 1;
       direction = 3;
+      spawnfood();
       
       game = GAME;
-      
       break;
   }
   
