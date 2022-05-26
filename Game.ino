@@ -19,7 +19,7 @@ int direction = 3;
 int x = 3;
 int y = 4;
 
-int delay_msec = 600;
+int delayframes = 8;
 
 // this function runs once
 void setup() {
@@ -40,27 +40,37 @@ void loop() {
   
   arduboy.setCursor(0, 0);
   
-  if (arduboy.pressed(DOWN_BUTTON) && direction != 2) { direction = 1; }
-  if (arduboy.pressed(UP_BUTTON) && direction != 1) { direction = 2; }
-  if (arduboy.pressed(RIGHT_BUTTON) && direction != 3) { direction = 3; }
-  if (arduboy.pressed(LEFT_BUTTON) && direction != 4) { direction = 4; }
-  
-  switch (direction) {
-    case 1: // down
-      y += 1;
-      break;
-      
-    case 2: // up
-      y -= 1;
-      break;
-      
-    case 3: // right
-      x += 1;
-      break;
-      
-    case 4: // left
-      x -= 1;
-      break;
+
+  // delays movement by a set amount of frames while still allowing input
+  if (delayframes > 0) {
+    if (arduboy.pressed(DOWN_BUTTON) && direction != 2) { direction = 1; }
+    if (arduboy.pressed(UP_BUTTON) && direction != 1) { direction = 2; }
+    if (arduboy.pressed(RIGHT_BUTTON) && direction != 3) { direction = 3; }
+    if (arduboy.pressed(LEFT_BUTTON) && direction != 4) { direction = 4; }
+    
+    delayframes -= 1;
+    
+  } else {
+    switch (direction) {
+      case 1: // down
+        y += 1;
+        break;
+        
+      case 2: // up
+        y -= 1;
+        break;
+        
+      case 3: // right
+        x += 1;
+        break;
+        
+      case 4: // left
+        x -= 1;
+        break;
+    }
+    
+    delayframes = 15;
+    
   }
   
   
@@ -73,7 +83,6 @@ void loop() {
   
   arduboy.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   
-  arduboy.delayShort(delay_msec);
   
   arduboy.display();
 }
