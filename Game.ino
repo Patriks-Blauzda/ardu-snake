@@ -14,12 +14,30 @@ enum state {
 
 
 // vars
-int direction = 3;
+int direction = 3; // movement direction
 
-int x = 3;
+int x = 3; // snake coordinates
 int y = 4;
 
-int delayframes = 8;
+int length = 3; // length of the snake
+
+// snake movement history array
+byte snaketrail[(128/TILE_SIZE) * (64/TILE_SIZE)][2];
+
+int delayframes = 6; // amount of frames that pass before the snake moves
+
+// pushes back all elements and adds new elements to index 0
+// used for saving tail positions
+void snake_pushback(int x, int y) {
+  for (int i = sizeof(snaketrail) - 1; i >= 0; i--) {
+    snaketrail[i][0] = snaketrail[i - 1][0];
+    snaketrail[i][1] = snaketrail[i - 1][1];
+  }
+  
+  snaketrail[0][0] = x;
+  snaketrail[0][1] = y;
+}
+
 
 // this function runs once
 void setup() {
@@ -45,8 +63,8 @@ void loop() {
   if (delayframes > 0) {
     if (arduboy.pressed(DOWN_BUTTON) && direction != 2) { direction = 1; }
     if (arduboy.pressed(UP_BUTTON) && direction != 1) { direction = 2; }
-    if (arduboy.pressed(RIGHT_BUTTON) && direction != 3) { direction = 3; }
-    if (arduboy.pressed(LEFT_BUTTON) && direction != 4) { direction = 4; }
+    if (arduboy.pressed(RIGHT_BUTTON) && direction != 4) { direction = 3; }
+    if (arduboy.pressed(LEFT_BUTTON) && direction != 3) { direction = 4; }
     
     delayframes -= 1;
     
@@ -71,14 +89,21 @@ void loop() {
     
     delayframes = 15;
     
+    snake_pushback(x, y);
   }
   
   
-  if (x > 128/TILE_SIZE) { x = 1; }
-  else if ( x < 1) { x = 128/TILE_SIZE; }
+  if (x > 128/TILE_SIZE - 1) { x = 0; }
+  else if ( x < 0) { x = 128/TILE_SIZE - 1; }
   
-  if (y > 64/TILE_SIZE) { y = 1; }
-  else if ( y < 1) { y = 64/TILE_SIZE; }
+  if (y > 64/TILE_SIZE - 1) { y = 0; }
+  else if ( y < 0) { y = 64/TILE_SIZE - 1; }
+  
+  
+  // snake tail drawing
+  for (int i = 0; i < length; i++) {
+    arduboy.fillRect(snaketrail[i][0] * TILE_SIZE, snaketrail[i][1] * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+  }
   
   
   arduboy.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
