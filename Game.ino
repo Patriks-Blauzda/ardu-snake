@@ -29,7 +29,7 @@ int length = 1; // length of the snake
 // snake movement history array
 byte snaketrail[(128/TILE_SIZE) * (64/TILE_SIZE)][2];
 
-int delayframes = 5; // amount of frames that pass before the snake moves
+int delayframes = 15; // amount of frames that pass before the snake moves
 
 // pushes back all elements and adds new elements to index 0
 // used for saving tail positions
@@ -79,6 +79,21 @@ void setup() {
 }
 
 
+// checks if a movement button is the only one pressed
+bool onepressed(int button){
+  bool buttons[4] = {
+    arduboy.pressed(DOWN_BUTTON), arduboy.pressed(UP_BUTTON),
+    arduboy.pressed(RIGHT_BUTTON), arduboy.pressed(LEFT_BUTTON)
+  };
+  
+  if (buttons[button] && !buttons[2] && !buttons[3]) {return true;}
+  else if (buttons[button] && !buttons[2] && !buttons[3]) {return true;}
+  else if (buttons[button] && !buttons[0] && !buttons[1]) {return true;}
+  else if (buttons[button] && !buttons[0] && !buttons[1]) {return true;}
+  else {return false;}
+}
+
+
 void loop() {
   // pause render until it's time for the next frame
   if (!(arduboy.nextFrame()))
@@ -103,11 +118,12 @@ void loop() {
     
     case GAME:
       // delays movement by a set amount of frames while still allowing input
+      // if turning the snake, delay is cancelled
       if (delayframes > 0) {
-        if (arduboy.pressed(DOWN_BUTTON) && direction != 2) { direction = 1; }
-        if (arduboy.pressed(UP_BUTTON) && direction != 1) { direction = 2; }
-        if (arduboy.pressed(RIGHT_BUTTON) && direction != 4) { direction = 3; }
-        if (arduboy.pressed(LEFT_BUTTON) && direction != 3) { direction = 4; }
+        if (onepressed(0) && direction != 2 && direction != 1) { direction = 1; delayframes = 0;}
+        if (onepressed(1) && direction != 1 && direction != 2) { direction = 2; delayframes = 0;}
+        if (onepressed(2) && direction != 4 && direction != 3) { direction = 3; delayframes = 0;}
+        if (onepressed(3) && direction != 3 && direction != 4) { direction = 4; delayframes = 0;}
         
         delayframes -= 1;
         
@@ -131,7 +147,7 @@ void loop() {
             break;
         }
         
-        delayframes = 10;
+        delayframes = 15;
         
         snake_pushback(x, y);
       }
