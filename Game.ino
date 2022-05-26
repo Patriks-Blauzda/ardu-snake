@@ -34,6 +34,12 @@ void snake_pushback(int x, int y) {
     snaketrail[i][1] = snaketrail[i - 1][1];
   }
   
+  if (x > 128/TILE_SIZE - 1) { x = 0; }
+  else if ( x < 0) { x = 128/TILE_SIZE - 1; }
+  
+  if (y > 64/TILE_SIZE - 1) { y = 0; }
+  else if ( y < 0) { y = 64/TILE_SIZE - 1; }
+  
   snaketrail[0][0] = x;
   snaketrail[0][1] = y;
 }
