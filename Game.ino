@@ -7,12 +7,13 @@ Arduboy2 arduboy;
 
 // game states
 enum state {
-  START,
-  GAME,
-  LOSE
+  START = 1,
+  GAME = 2,
+  LOSE = 3,
+  RESET = 4
 };
 
-enum state game = GAME;
+enum state game = START;
 
 // vars
 int direction = 3; // movement direction
@@ -20,7 +21,7 @@ int direction = 3; // movement direction
 int x = 3; // snake coordinates
 int y = 4;
 
-int length = 10; // length of the snake
+int length = 1; // length of the snake
 
 // snake movement history array
 byte snaketrail[(128/TILE_SIZE) * (64/TILE_SIZE)][2];
@@ -65,6 +66,16 @@ void loop() {
   
   switch (game){
     case START:
+      arduboy.setCursor(128/3.5, 64/4);
+      arduboy.print("ARDU-SNAKE");
+      
+      arduboy.setCursor(128/3, 64/1.4);
+      arduboy.print("PRESS A");
+      
+      if (arduboy.pressed(A_BUTTON)){
+        game = RESET;
+      }
+      
       break;
     
     
@@ -120,11 +131,35 @@ void loop() {
       }
       
       
-      arduboy.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+//      arduboy.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
       break;
     
     
     case LOSE:
+      arduboy.setCursor(128/3.5, 64/4);
+      arduboy.print("GAME OVER");
+      
+      arduboy.setCursor(128/3.35, 64/2);
+      arduboy.print("Score: ");
+      arduboy.print(length - 1);
+      
+      arduboy.setCursor(128/3, 64/1.25);
+      arduboy.print("PRESS A");
+      
+      if (arduboy.pressed(A_BUTTON)){
+        game = START;
+      }
+      break;
+      
+    
+    case RESET:
+      x = 3;
+      y = 4;
+      length = 5;
+      direction = 3;
+      
+      game = GAME;
+      
       break;
   }
   
