@@ -5,6 +5,11 @@ Arduboy2 arduboy;
 // screen size: 128x64
 #define TILE_SIZE 8
 
+#define WIDTH (128/TILE_SIZE)
+#define HEIGHT (64/TILE_SIZE)
+
+#define SNAKE_HEAD snaketrail[0]
+
 // game states
 enum state {
   START = 1,
@@ -30,7 +35,7 @@ enum directionstate direction = RIGHT;
 struct vector2d { byte x; byte y; }; // struct for object position
 
 // snake movement history array
-struct vector2d snaketrail[(128/TILE_SIZE) * (64/TILE_SIZE)];
+struct vector2d snaketrail[(WIDTH) * (HEIGHT)];
 
 struct vector2d food; // position struct for food
 
@@ -48,8 +53,8 @@ void snake_pushback(byte x, byte y) {
     snaketrail[i].y = snaketrail[i - 1].y;
   }
   
-  snaketrail[0].x = x;
-  snaketrail[0].y = y;
+  SNAKE_HEAD.x = x;
+  SNAKE_HEAD.y = y;
 }
 
 
@@ -59,8 +64,8 @@ void spawnfood() {
   food.y = 0;
   
   while (food.x == 0 && food.y == 0){
-    food.x = random(1, 128/TILE_SIZE - 1);
-    food.y = random(1, 64/TILE_SIZE - 1);
+    food.x = random(1, WIDTH - 1);
+    food.y = random(1, HEIGHT - 1);
     
     for (byte i = 0; i < length; i++) {
       if (snaketrail[i].x == food.x && snaketrail[i].y == food.y){
@@ -142,28 +147,28 @@ void loop() {
       // moves the snake depending on the direction it faces
       } else {
         
-        snake_pushback(snaketrail[0].x, snaketrail[0].y);
+        snake_pushback(SNAKE_HEAD.x, SNAKE_HEAD.y);
         
         // screen looping and snake movement
         switch (direction) {
           case DOWN:
-            if (snaketrail[0].y >= 64/TILE_SIZE - 1) { snaketrail[0].y = 0; break; }
-            snaketrail[0].y += 1;
+            if (SNAKE_HEAD.y >= HEIGHT - 1) { SNAKE_HEAD.y = 0; break; }
+            SNAKE_HEAD.y += 1;
             break;
             
           case UP:
-            if (snaketrail[0].y == 0) { snaketrail[0].y = 64/TILE_SIZE; }
-            snaketrail[0].y -= 1;
+            if (SNAKE_HEAD.y == 0) { SNAKE_HEAD.y = HEIGHT; }
+            SNAKE_HEAD.y -= 1;
             break;
             
           case RIGHT:
-            if (snaketrail[0].x >= 128/TILE_SIZE - 1) { snaketrail[0].x = 0; break; }
-            snaketrail[0].x += 1;
+            if (SNAKE_HEAD.x >= WIDTH - 1) { SNAKE_HEAD.x = 0; break; }
+            SNAKE_HEAD.x += 1;
             break;
             
           case LEFT:
-            if (snaketrail[0].x == 0) { snaketrail[0].x = 128/TILE_SIZE; }
-            snaketrail[0].x -= 1;
+            if (SNAKE_HEAD.x == 0) { SNAKE_HEAD.x = WIDTH; }
+            SNAKE_HEAD.x -= 1;
             break;
         }
         
@@ -174,7 +179,7 @@ void loop() {
       
       // draws the entire snake and checks for collisions
       for (byte i = 0; i < length; i++) {
-        if (snaketrail[i + 1].x == snaketrail[0].x && snaketrail[i + 1].y == snaketrail[0].y){
+        if (snaketrail[i + 1].x == SNAKE_HEAD.x && snaketrail[i + 1].y == SNAKE_HEAD.y){
           game = LOSE;
         }
         
@@ -183,7 +188,7 @@ void loop() {
       }
       
       // checks if the player is touching the food
-      if (snaketrail[0].x == food.x && snaketrail[0].y == food.y){
+      if (SNAKE_HEAD.x == food.x && SNAKE_HEAD.y == food.y){
         length += 1;
         spawnfood();
       }
@@ -216,8 +221,8 @@ void loop() {
       // immediately moves to force the visuals to update
       delayframes = 0;
       
-      snaketrail[0].x = 3;
-      snaketrail[0].y = 4;
+      SNAKE_HEAD.x = 3;
+      SNAKE_HEAD.y = 4;
       
       length = 1;
       
