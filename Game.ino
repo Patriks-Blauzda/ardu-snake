@@ -34,16 +34,18 @@ struct vector2d snaketrail[(128/TILE_SIZE) * (64/TILE_SIZE)];
 
 struct vector2d food; // position struct for food
 
-int length = 1; // length of the snake
+byte length = 1; // length of the snake
 
 int delayframes = 15; // amount of frames that pass before the snake moves
+// delayframes must stay as an int, otherwise the game freezes
+// for a while after moving
 
 
 // pushes back all elements and adds new elements to index 0
 // used for saving tail positions
 // index 0 is the snake's head
-void snake_pushback(int x, int y) {
-  for (int i = sizeof(snaketrail) - 1; i > 0; i--) {
+void snake_pushback(byte x, byte y) {
+  for (byte i = sizeof(snaketrail) - 1; i > 0; i--) {
     snaketrail[i].x = snaketrail[i - 1].x;
     snaketrail[i].y = snaketrail[i - 1].y;
   }
@@ -62,7 +64,7 @@ void spawnfood() {
     food.x = random(1, 128/TILE_SIZE - 1);
     food.y = random(1, 64/TILE_SIZE - 1);
     
-    for (int i = 0; i < length; i++) {
+    for (byte i = 0; i < length; i++) {
       if (snaketrail[i].x == food.x && snaketrail[i].y == food.y){
         food.x = 0;
         food.y = 0;
@@ -167,7 +169,7 @@ void loop() {
       
       
       // draws the entire snake and checks for collisions
-      for (int i = 0; i < length; i++) {
+      for (byte i = 0; i < length; i++) {
         if (snaketrail[i + 1].x == snaketrail[0].x && snaketrail[i + 1].y == snaketrail[0].y){
           game = LOSE;
         }
