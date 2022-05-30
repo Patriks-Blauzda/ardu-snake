@@ -60,17 +60,17 @@ void snake_pushback(byte x, byte y) {
 
 // spawns food randomly, not placing it on the snake
 void spawnfood() {
-  food.x = 0;
-  food.y = 0;
+  food.x = WIDTH + 1;
+  food.y = HEIGHT + 1;
   
-  while (food.x == 0 && food.y == 0){
-    food.x = random(1, WIDTH - 1);
-    food.y = random(1, HEIGHT - 1);
+  while (food.x == WIDTH + 1 && food.y == HEIGHT + 1){
+    food.x = random(0, WIDTH);
+    food.y = random(0, HEIGHT);
     
     for (byte i = 0; i < length; i++) {
       if (snaketrail[i].x == food.x && snaketrail[i].y == food.y){
-        food.x = 0;
-        food.y = 0;
+        food.x = WIDTH + 1;
+        food.y = HEIGHT + 1;
       }
     }
   }
