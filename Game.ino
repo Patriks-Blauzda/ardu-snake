@@ -36,9 +36,7 @@ struct vector2d food; // position struct for food
 
 byte length = 1; // length of the snake
 
-int delayframes = 15; // amount of frames that pass before the snake moves
-// delayframes must stay as an int, otherwise the game freezes
-// for a while after moving
+byte delayframes = 16; // amount of frames that pass before the snake moves
 
 
 // pushes back all elements and adds new elements to index 0
@@ -85,19 +83,28 @@ void setup() {
 
 
 // checks if a movement button is the only one pressed
-bool onepressed(int button){
-  bool buttons[4] = {
-    arduboy.pressed(DOWN_BUTTON), arduboy.pressed(UP_BUTTON),
-    arduboy.pressed(RIGHT_BUTTON), arduboy.pressed(LEFT_BUTTON)
-  };
+enum directionstate changedirection(){
+  // checks if specified button is pressed and other possible buttons aren't
+  bool down = arduboy.pressed(DOWN_BUTTON) && (!arduboy.pressed(RIGHT_BUTTON) && !arduboy.pressed(LEFT_BUTTON));
+  bool up = arduboy.pressed(UP_BUTTON) && (!arduboy.pressed(RIGHT_BUTTON) && !arduboy.pressed(LEFT_BUTTON));
+  bool right = arduboy.pressed(RIGHT_BUTTON) && (!arduboy.pressed(DOWN_BUTTON) && !arduboy.pressed(UP_BUTTON));
+  bool left = arduboy.pressed(LEFT_BUTTON) && (!arduboy.pressed(DOWN_BUTTON) && !arduboy.pressed(UP_BUTTON));
   
-  // checks if specified button from the array is the only one pressed
-  // excludes checking the opposite directional button
-  if (buttons[button] && !buttons[2] && !buttons[3]) {return true;}
-  else if (buttons[button] && !buttons[2] && !buttons[3]) {return true;}
-  else if (buttons[button] && !buttons[0] && !buttons[1]) {return true;}
-  else if (buttons[button] && !buttons[0] && !buttons[1]) {return true;}
-  else {return false;}
+  
+  // if the button pressed isn't the current direction or the opposite of
+  // the current direction, turn that way and skip delayframes to move immediately
+  if ( up && direction != UP && direction != DOWN) { 
+    delayframes = 0; return direction = UP; } 
+    
+  else if (down && direction != DOWN && direction != UP) { 
+    delayframes = 0; return direction = DOWN; }
+    
+  else if (right && direction != LEFT && direction != RIGHT) { 
+    delayframes = 0; return direction = RIGHT; }
+    
+  else if (left && direction != RIGHT && direction != LEFT) { 
+    delayframes = 0; return direction = LEFT; 
+  }
 }
 
 
@@ -128,12 +135,9 @@ void loop() {
       // if turning the snake, delay is cancelled
       // moving opposite the direction the snake faces is made impossible
       if (delayframes > 0) {
-        if (onepressed(0) && direction != UP && direction != DOWN) { direction = DOWN; delayframes = 0;}
-        if (onepressed(1) && direction != DOWN && direction != UP) { direction = UP; delayframes = 0;}
-        if (onepressed(2) && direction != LEFT && direction != RIGHT) { direction = RIGHT; delayframes = 0;}
-        if (onepressed(3) && direction != RIGHT && direction != LEFT) { direction = LEFT; delayframes = 0;}
         
         delayframes -= 1;
+        changedirection();
         
       // moves the snake depending on the direction it faces
       } else {
@@ -164,7 +168,7 @@ void loop() {
         }
         
         
-        delayframes = 15;
+        delayframes = 16;
       }
       
       
