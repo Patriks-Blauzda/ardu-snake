@@ -179,7 +179,7 @@ void loop() {
       
       // draws the entire snake and checks for collisions
       for (byte i = 0; i < length; i++) {
-        if (snaketrail[i + 1].x == SNAKE_HEAD.x && snaketrail[i + 1].y == SNAKE_HEAD.y){
+        if (snaketrail[i].x == SNAKE_HEAD.x && snaketrail[i].y == SNAKE_HEAD.y && i != 0){
           game = LOSE;
         }
         
