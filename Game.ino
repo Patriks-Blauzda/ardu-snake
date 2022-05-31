@@ -88,27 +88,33 @@ void setup() {
 
 
 // checks if a movement button is the only one pressed
-enum directionstate changedirection(){
-  // checks if specified button is pressed and other possible buttons aren't
-  bool down = arduboy.pressed(DOWN_BUTTON) && (!arduboy.pressed(RIGHT_BUTTON) && !arduboy.pressed(LEFT_BUTTON));
-  bool up = arduboy.pressed(UP_BUTTON) && (!arduboy.pressed(RIGHT_BUTTON) && !arduboy.pressed(LEFT_BUTTON));
-  bool right = arduboy.pressed(RIGHT_BUTTON) && (!arduboy.pressed(DOWN_BUTTON) && !arduboy.pressed(UP_BUTTON));
-  bool left = arduboy.pressed(LEFT_BUTTON) && (!arduboy.pressed(DOWN_BUTTON) && !arduboy.pressed(UP_BUTTON));
+void changedirection(){
+  // true when corresponding d-pad button is pressed
+  bool down = arduboy.pressed(DOWN_BUTTON);
+  bool up = arduboy.pressed(UP_BUTTON);
+  bool right = arduboy.pressed(RIGHT_BUTTON);
+  bool left = arduboy.pressed(LEFT_BUTTON);
+  
+  // false if more than one button is pressed
+  down = down && (!right && !left);
+  up = up && (!right && !left);
+  right = right && (!down && !up);
+  left = left && (!down && !up);
   
   
   // if the button pressed isn't the current direction or the opposite of
   // the current direction, turn that way and skip delayframes to move immediately
   if ( up && direction != UP && direction != DOWN) { 
-    delayframes = 0; return direction = UP; } 
+    delayframes = 0; direction = UP; } 
     
   else if (down && direction != DOWN && direction != UP) { 
-    delayframes = 0; return direction = DOWN; }
+    delayframes = 0; direction = DOWN; }
     
   else if (right && direction != LEFT && direction != RIGHT) { 
-    delayframes = 0; return direction = RIGHT; }
+    delayframes = 0; direction = RIGHT; }
     
   else if (left && direction != RIGHT && direction != LEFT) { 
-    delayframes = 0; return direction = LEFT; 
+    delayframes = 0; direction = LEFT; 
   }
 }
 
