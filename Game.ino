@@ -95,11 +95,8 @@ void changedirection(){
   bool right = arduboy.pressed(RIGHT_BUTTON);
   bool left = arduboy.pressed(LEFT_BUTTON);
   
-  // false if more than one button is pressed
-  down = down && (!right && !left);
-  up = up && (!right && !left);
-  right = right && (!down && !up);
-  left = left && (!down && !up);
+  // direction doesn't change if more than one button or no buttons are pressed
+  if (down + up + right + left != 1) { return; }
   
   
   // if the button pressed isn't the current direction or the opposite of
